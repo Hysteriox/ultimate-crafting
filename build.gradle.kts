@@ -6,7 +6,7 @@ import java.util.zip.ZipOutputStream
 
 plugins {
     `java-library`
-    id("com.github.johnrengelman.shadow") version "7.1.2" apply false
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     id("xyz.jpenilla.run-paper") version "1.0.6"
 
     // TODO:
@@ -105,6 +105,7 @@ allprojects {
 //    tasks.withType<ShadowJar> {
 //        dependsOn(autoRelocate)
 //    }
+
 
     java {
         toolchain {

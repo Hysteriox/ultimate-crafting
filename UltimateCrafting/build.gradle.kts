@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 version = "5.2.8"
 
 dependencies {
@@ -23,4 +25,8 @@ tasks {
     named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
         relocate("de.tr7zw", "mc.ultimatecore.crafting.depends")
     }
+}
+
+tasks.withType<ShadowJar> {
+    destinationDirectory.set(file("../out/"));
 }
