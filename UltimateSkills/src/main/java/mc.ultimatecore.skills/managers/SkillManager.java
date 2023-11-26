@@ -319,15 +319,15 @@ public class SkillManager {
         return skillsCache.size();
     }
 
+    @SuppressWarnings("deprecation")
     public void manageBlockPoints(Player player, Block bl, Material mat, boolean multiplyRewards) {
-        XMaterial material = XBlock.getType(bl);
         String key = mat.toString();
         if (!plugin.getSkillPoints().skillBlocksXP.containsKey(key)) {
             return;
         }
 
         BlockXP skillXP = plugin.getSkillPoints().skillBlocksXP.get(key);
-        if (material.getData() != skillXP.getMaterialData() && skillXP.getMaterialData() != -1) {
+        if (bl.getData() != skillXP.getMaterialData() && skillXP.getMaterialData() != -1) {
             return;
         }
 

@@ -37,13 +37,12 @@ public class BlockBreakListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void blockBreakSkills(BlockBreakEvent e) {
         Block bl = e.getBlock();
         Player player = e.getPlayer();
         try {
             if (bl.hasMetadata(Constants.PLACED_BLOCK_KEY)) return;
-            if(e.isCancelled()) return;
             Material mat = bl.getType();
             plugin.getSkillManager().manageBlockPoints(player, bl, mat, true);
         } catch (Exception exception) {
