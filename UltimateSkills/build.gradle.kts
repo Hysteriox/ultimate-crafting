@@ -30,3 +30,7 @@ tasks {
         relocate("de.tr7zw", "mc.ultimatecore.skills.depends")
     }
 }
+
+tasks.withType<ShadowJar> {
+    destinationDirectory.set(file("../out/"));
+}
