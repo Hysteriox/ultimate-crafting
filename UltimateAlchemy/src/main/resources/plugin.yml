@@ -1,0 +1,10 @@
+name: UltimateCore-Alchemy
+description: UltimateCore's Alchemy plugin
+main: mc.ultimatecore.alchemy.HyperAlchemy
+version: "5.2.8"
+api-version: 1.13
+authors: [ EduardWayland, ZubeySweet ]
+load: POSTWORLD
+commands:
+  hyperalchemy:
+    description: UltimateCore's Alchemy main command

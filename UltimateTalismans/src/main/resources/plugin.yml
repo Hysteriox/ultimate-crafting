@@ -1,0 +1,13 @@
+name: UltimateCore-Talismans
+description: UltimateCore's Talismans plugin
+main: mc.ultimatecore.talismans.HyperTalismans
+version: "5.2.8"
+api-version: 1.13
+authors: [ EduardWayland, ZubeySweet ]
+load: POSTWORLD
+softdepend: [ Vault, UltimateCore-Skills ]
+depend:
+    - UltimateCore
+commands:
+  talismans:
+    description: UltimateCore's Talismans main command

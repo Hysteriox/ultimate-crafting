@@ -1,0 +1,14 @@
+name: UltimateCore-Farm
+description: UltimateCore's Farm plugin
+main: mc.ultimatecore.farm.HyperRegions
+version: "5.2.8"
+api-version: 1.13
+authors: [ EduardWayland, ZubeySweet ]
+load: POSTWORLD
+softdepend: [ WorldEdit, WorldGuard, Multiverse-Core, Residence, UltraRegions ]
+depend:
+    - UltimateCore
+commands:
+  ultimatefarm:
+    aliases: [ "ucfarm" ]
+    description: UltimateCore's Farm main command
