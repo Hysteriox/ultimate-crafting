@@ -18,7 +18,7 @@ public class InventoryCloseListener implements Listener {
         Inventory inventory = event.getInventory();
         if (inventory.getHolder() instanceof CraftingGUI) {
             Inventory topInventory = event.getView().getTopInventory();
-            for (Integer craftingSlot : this.plugin.getCraftingSlots()) {
+            for (Integer craftingSlot : this.plugin.getInventories().craftingSlots) {
                 if(topInventory.getItem(craftingSlot) != null) {
                     event.getPlayer().getInventory().addItem(topInventory.getItem(craftingSlot));
                     topInventory.setItem(craftingSlot, null);
