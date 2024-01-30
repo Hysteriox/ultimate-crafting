@@ -33,6 +33,9 @@ import java.util.Arrays;
 @Getter
 public class HyperSkills extends UltimatePlugin {
 
+    private static HyperSkills instance;
+
+
     private Config configuration;
     private Messages messages;
     private Rewards rewards;
@@ -57,59 +60,30 @@ public class HyperSkills extends UltimatePlugin {
     private GSON gson;
 
     public static HyperSkills getInstance() {
-        return HyperSkills.getPlugin(HyperSkills.class);
+        if (instance == null) return HyperSkills.getPlugin(HyperSkills.class);
+        return instance;
     }
 
     @Override
     public void onEnable() {
-        getLogger().info("GSON - START");
+        instance = this;
+
         this.gson = new GSON();
-        getLogger().info("GSON - END");
-        getLogger().info("CONFIGS - START");
         loadConfigs();
-        getLogger().info("CONFIGS - END");
-        getLogger().info("CREDENTIALS - START");
         Credentials credentials = Credentials.fromConfig(configuration.getConfig());
-        getLogger().info("CREDENTIALS - END");
-        getLogger().info("PLUGIN DATABASE - START");
         this.pluginDatabase = credentials.getDatabaseType() == DatabaseType.MySQL ? new MySQLDatabase(this, credentials) : new SQLiteDatabase(this, credentials);
-        getLogger().info("PLUGIN DATABASE - END");
-        getLogger().info("SKILLS API - START");
         this.api = new HyperSkillsAPIImpl(this);
-        getLogger().info("SKILLS API - END");
-        getLogger().info("SKILLS MANAGER - START");
         this.skillManager = new SkillManager(this);
-        getLogger().info("SKILLS MANAGER - END");
-        getLogger().info("PERKS MANAGER - START");
         this.perksManager = new PerksManager(this);
-        getLogger().info("PERKS MANAGER - END");
-        getLogger().info("ABILITIES MANAGER - START");
         this.abilitiesManager = new AbilitiesManager(this);
-        getLogger().info("ABILITIES MANAGER - END");
-        getLogger().info("ADDONS MANAGER - START");
         this.addonsManager = new AddonsManager(this);
-        getLogger().info("ADDONS MANAGER - END");
-        getLogger().info("COMMAND MANAGER - START");
         this.commandManager = new CommandManager(this);
-        getLogger().info("COMMAND MANAGER - END");
-        getLogger().info("ACTIONBAR MANAGER - START");
         this.actionBarManager = new ActionBarManager(this);
-        getLogger().info("ACTIONBAR MANAGER - END");
-        getLogger().info("RESET DATA MANAGER - START");
         this.resetDataManager = new ResetDataManager(this);
-        getLogger().info("RESET DATA MANAGER - END");
-        getLogger().info("MANA MANAGER - START");
         this.manaManager = new ManaManager(this);
-        getLogger().info("MANA MANAGER - END");
-        getLogger().info("SPEED MANAGER - START");
         this.speedManager = new SpeedManager(this);
-        getLogger().info("SPEED MANAGER - END");
-        getLogger().info("HEALTH MANAGER - START");
         this.healthManager = new HealthManager(this);
-        getLogger().info("HEALTH MANAGER - END");
-        getLogger().info("REGISTER LISTENERS - START");
         registerListeners(actionBarManager, new DamageListener(this), new ArmorListener(new ArrayList<>()), new BlockBreakListener(this), new ArmorSetupListener(), new ArmorEquipListener(), new AlchemyListener(this), XMaterial.getVersion() == 8 ? new MobKillListener_Legacy(this) : new MobKillListener(this), new PlayerJoinLeaveListener(this), new EnchantingListener(this), new FishingListener(this), new AlchemyPerks(), new DefenseListener(this), new EnchantingPerks(), new BlockPlaceListener(getConfiguration()), new ItemStatsListener(this), new InventoryClickListener());
-        getLogger().info("REGISTER LISTENERS - END");
         Bukkit.getConsoleSender().sendMessage(StringUtils.color("&e" + getDescription().getName() + " Has been enabled!"));
     }
 
