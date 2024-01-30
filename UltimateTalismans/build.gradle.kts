@@ -21,3 +21,7 @@ tasks {
         relocate("de.tr7zw", "mc.ultimatecore.tailsmans.depends")
     }
 }
+
+tasks.withType<ShadowJar> {
+    destinationDirectory.set(file("../out/"));
+}
