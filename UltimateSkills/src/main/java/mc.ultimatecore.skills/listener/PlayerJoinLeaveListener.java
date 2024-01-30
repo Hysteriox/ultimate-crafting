@@ -50,8 +50,6 @@ public class PlayerJoinLeaveListener implements Listener {
         try {
             Player player = event.getPlayer();
 
-            plugin.getAbilitiesManager().savePlayerData(player, true, true);
-
             plugin.getPerksManager().savePlayerData(player, true, true);
 
             plugin.getSkillManager().savePlayerData(player, true, true);

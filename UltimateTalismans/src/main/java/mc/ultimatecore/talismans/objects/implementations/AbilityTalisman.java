@@ -21,11 +21,11 @@ public class AbilityTalisman extends Talisman implements StatsTalisman{
 
     @Override
     public void execute(Player player, Integer repeat) {
-        abilities.forEach((ability, amount) -> HyperSkills.getInstance().getApi().addArmorAbility(player.getUniqueId(), ability, amount * repeat));
+        abilities.forEach((ability, amount) -> HyperSkills.getInstance().getApi().addAbility(player.getUniqueId(), ability, amount * repeat));
     }
 
     @Override
     public void stop(Player player, Integer repeat) {
-        abilities.forEach((ability, amount) -> HyperSkills.getInstance().getApi().removeArmorAbility(player.getUniqueId(), ability, amount * repeat));
+        abilities.forEach((ability, amount) -> HyperSkills.getInstance().getApi().removeAbility(player.getUniqueId(), ability, amount * repeat));
     }
 }

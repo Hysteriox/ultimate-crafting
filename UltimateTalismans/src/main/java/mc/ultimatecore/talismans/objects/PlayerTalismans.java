@@ -14,9 +14,7 @@ public class PlayerTalismans {
     private final UUID uuid;
     private int emeraldTask;
     private int countTask;
-    @Getter
     private Set<String> normalTalismans;
-    @Getter
     private final Set<String> bagTalismans;
     private final HyperTalismans plugin = HyperTalismans.getInstance();
 
@@ -171,5 +169,15 @@ public class PlayerTalismans {
     }
 
 
+    public Set<String> getNormalTalismans() {
+        return normalTalismans;
+    }
 
+    public void setNormalTalismans(Set<String> normalTalismans) {
+        this.normalTalismans = normalTalismans;
+    }
+
+    public Set<String> getBagTalismans() {
+        return bagTalismans;
+    }
 }

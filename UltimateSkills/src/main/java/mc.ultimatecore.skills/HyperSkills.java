@@ -35,7 +35,6 @@ public class HyperSkills extends UltimatePlugin {
 
     private static HyperSkills instance;
 
-
     private Config configuration;
     private Messages messages;
     private Rewards rewards;
@@ -60,7 +59,9 @@ public class HyperSkills extends UltimatePlugin {
     private GSON gson;
 
     public static HyperSkills getInstance() {
-        if (instance == null) return HyperSkills.getPlugin(HyperSkills.class);
+        if (instance == null) {
+            return HyperSkills.getPlugin(HyperSkills.class);
+        }
         return instance;
     }
 

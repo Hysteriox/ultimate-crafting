@@ -19,7 +19,7 @@ dependencies {
 }
 
 tasks {
-    named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    named<ShadowJar>("shadowJar") {
         relocate("de.tr7zw", "mc.ultimatecore.tailsmans.depends")
     }
 }

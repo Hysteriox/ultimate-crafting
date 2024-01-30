@@ -11,21 +11,26 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 public class AbilitiesManager {
     private final HyperSkills plugin;
-    private final Map<UUID, PlayerAbilities> abilitiesCache = new HashMap<>();
+    private final Map<UUID, PlayerAbilities> abilitiesCache = new ConcurrentHashMap<>();
     private final Set<UUID> _currentlyLoading = new HashSet<>();
 
     public AbilitiesManager(HyperSkills plugin) {
         this.plugin = plugin;
         this.loadPlayerDataOnEnable();
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(this.plugin, () ->
+                this.saveCachedPlayers(true), 20L, 20 * 60);
     }
 
     public void disable(){
         savePlayerDataOnDisable();
     }
 
+    // UNUSED
+    /*
     public void savePlayerData(Player player, boolean removeFromCache, boolean async) {
         if (_currentlyLoading.contains(player.getUniqueId())) {
             return;
@@ -45,16 +50,33 @@ public class AbilitiesManager {
         }
     }
 
+     */
+
     private void savePlayerDataOnDisable() {
         this.plugin.sendDebug("[PLUGIN DISABLE] Saving all player data", DebugType.LOG);
-        for (UUID uuid : abilitiesCache.keySet()) {
-            if (_currentlyLoading.contains(uuid)) {
-                continue;
-            }
-            this.plugin.getPluginDatabase().savePlayerAbilities(Bukkit.getOfflinePlayer(uuid), abilitiesCache.get(uuid));
-        }
+        this.saveCachedPlayers(false);
         abilitiesCache.clear();
         this.plugin.sendDebug("[PLUGIN DISABLE] Saved all player data to database - abilities", DebugType.LOG);
+    }
+
+    private void saveCachedPlayers(boolean removeFromCache) {
+        final Set<UUID> toRemove = removeFromCache ? new HashSet<>() : Collections.emptySet();
+        this.abilitiesCache.forEach((uuid, abilities) -> {
+            if (abilities.hasUpdated()) {
+                if (_currentlyLoading.contains(uuid)) {
+                    return;
+                }
+
+                final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+
+                if (!offlinePlayer.isOnline() && removeFromCache) {
+                    toRemove.add(uuid);
+                }
+
+                this.plugin.getPluginDatabase().savePlayerAbilities(offlinePlayer, abilitiesCache.get(uuid));
+            }
+        });
+        toRemove.forEach(this.abilitiesCache::remove);
     }
 
     public void addIntoTable(Player player) {

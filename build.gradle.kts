@@ -129,3 +129,10 @@ afterEvaluate {
         dependsOn(moveJars)
     }
 }
+
+
+tasks.register<Copy>("copyDevJars") {
+    from(layout.files("out/"))
+    include("*.jar")
+    into("../server/plugins/")
+}
