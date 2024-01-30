@@ -5,9 +5,10 @@ version: "5.2.8"
 api-version: 1.13
 authors: [ EduardWayland, ZubeySweet ]
 load: POSTWORLD
-softdepend: [ Vault, UltimateCore-Skills ]
+softdepend: [ Vault ]
 depend:
     - UltimateCore
+    - UltimateCore-Skills
 commands:
   talismans:
     description: UltimateCore's Talismans main command
