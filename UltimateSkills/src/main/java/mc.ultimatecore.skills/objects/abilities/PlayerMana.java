@@ -27,15 +27,16 @@ public class PlayerMana {
     private boolean manageMana(ManaSettings manaSettings) {
         if (!HyperSkills.getInstance().getConfiguration().manaSystem)
             return false;
-        PlayerAbilities playerAbilities = HyperSkills.getInstance().getAbilitiesManager().getPlayerAbilities(uuid);
-        double maxMana = HyperSkills.getInstance().getApi().getTotalAbility(uuid, Ability.MAX_INTELLIGENCE);
-        double currentMana = HyperSkills.getInstance().getApi().getTotalAbility(uuid, Ability.INTELLIGENCE);
-        double amount = (manaSettings.getPercentagePerSecond() * maxMana) / 100;
-        double newMana = currentMana + amount;
-        if(currentMana > maxMana)
-            playerAbilities.setAbility(Ability.INTELLIGENCE, maxMana);
-        if(currentMana < maxMana)
-            playerAbilities.setAbility(Ability.INTELLIGENCE, Math.min(newMana, maxMana));
+        HyperSkills.getInstance().getAbilitiesManager().getUpdate(uuid, playerAbilities -> {
+            double maxMana = HyperSkills.getInstance().getApi().getTotalAbility(uuid, Ability.MAX_INTELLIGENCE);
+            double currentMana = HyperSkills.getInstance().getApi().getTotalAbility(uuid, Ability.INTELLIGENCE);
+            double amount = (manaSettings.getPercentagePerSecond() * maxMana) / 100;
+            double newMana = currentMana + amount;
+            if(currentMana > maxMana)
+                playerAbilities.setAbility(Ability.INTELLIGENCE, maxMana);
+            if(currentMana < maxMana)
+                playerAbilities.setAbility(Ability.INTELLIGENCE, Math.min(newMana, maxMana));
+        });
         return true;
     }
 

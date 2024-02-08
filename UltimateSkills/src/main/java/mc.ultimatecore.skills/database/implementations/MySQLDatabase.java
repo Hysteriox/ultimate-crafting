@@ -10,4 +10,19 @@ public class MySQLDatabase extends SQLDatabase {
 		super(parent);
 		this.connect(credentials);
 	}
+
+    @Override
+    public String saveAbilitiesStatement() {
+        return "INSERT INTO Abilities (UUID, Data) VALUES (?,?) ON DUPLICATE KEY UPDATE Data=?";
+    }
+
+    @Override
+    public String saveSkillsStatement() {
+        return "INSERT INTO Skills (UUID, Data) VALUES (?,?) ON DUPLICATE KEY UPDATE Data=?";
+    }
+
+    @Override
+    public String savePerksStatement() {
+        return "INSERT INTO Perks (UUID, Data) VALUES (?,?) ON DUPLICATE KEY UPDATE Data=?";
+    }
 }

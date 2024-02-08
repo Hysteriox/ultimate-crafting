@@ -1,10 +1,11 @@
 package mc.ultimatecore.skills.objects.abilities;
 
-import java.util.HashMap;
+import mc.ultimatecore.helper.implementations.object.*;
 
-public class PlayerAbilities {
+import java.util.*;
 
-    private boolean updated;
+public class PlayerAbilities extends DatabaseObject {
+
     private final HashMap<Ability, Double> playerAbilities = new HashMap<>();
 
     private final HashMap<Ability, Double> armorAbilities = new HashMap<>();
@@ -19,13 +20,11 @@ public class PlayerAbilities {
     public void addAbility(Ability ability, Double quantity) {
         final Double current = playerAbilities.getOrDefault(ability, 0D);
         playerAbilities.put(ability, current + quantity);
-        this.updated = true;
     }
 
     public void removeAbility(Ability ability, Double quantity) {
         final Double current = playerAbilities.getOrDefault(ability, 0D);
         playerAbilities.put(ability, current - quantity);
-        this.updated = true;
     }
 
     public Double getAbility(Ability ability) {
@@ -36,7 +35,6 @@ public class PlayerAbilities {
 
     public void setAbility(Ability ability, Double quantity) {
         playerAbilities.put(ability, quantity);
-        this.updated = true;
     }
 
     public Double getArmorAbility(Ability ability) {
@@ -53,15 +51,10 @@ public class PlayerAbilities {
     public void removeArmorAbility(Ability ability, Double quantity) {
         final Double current = armorAbilities.getOrDefault(ability, 0D);
         armorAbilities.put(ability, current - quantity);
-        updated = true;
     }
 
-    public boolean hasUpdated() {
-        if (this.updated) {
-            this.updated = false;
-            return true;
-        }
-
-        return false;
+    public void load(PlayerAbilities fromObject) {
+        this.playerAbilities.putAll(fromObject.playerAbilities);
+        this.armorAbilities.putAll(fromObject.armorAbilities);
     }
 }

@@ -3,7 +3,7 @@ package mc.ultimatecore.skills.api;
 import lombok.AllArgsConstructor;
 import mc.ultimatecore.skills.HyperSkills;
 import mc.ultimatecore.skills.objects.SkillType;
-import mc.ultimatecore.skills.objects.abilities.Ability;
+import mc.ultimatecore.skills.objects.abilities.*;
 import mc.ultimatecore.skills.objects.perks.Perk;
 import mc.ultimatecore.skills.objects.perks.PlayerPerks;
 
@@ -26,57 +26,57 @@ public class HyperSkillsAPIImpl implements HyperSkillsAPI {
 
     @Override
     public void setLevel(UUID uuid, SkillType skill, int level) {
-        plugin.getSkillManager().getPlayerSkills(uuid).setLevel(skill, level);
+        plugin.getSkillManager().getUpdate(uuid, skills -> skills.setLevel(skill, level));
     }
 
     @Override
     public void setXP(UUID uuid, SkillType skill, double xp) {
-        plugin.getSkillManager().setXP(uuid, skill, xp);
+        plugin.getSkillManager().getUpdate(uuid, skills -> skills.setXP(skill, xp));
     }
 
     @Override
     public void addLevel(UUID uuid, SkillType skill, int level) {
-        plugin.getSkillManager().getPlayerSkills(uuid).addLevel(skill, level);
+        plugin.getSkillManager().getUpdate(uuid, skills -> skills.addLevel(skill, level));
     }
 
     @Override
     public void addXP(UUID uuid, SkillType skill, double xp) {
-        plugin.getSkillManager().addXP(uuid, skill, xp);
+        plugin.getSkillManager().getUpdate(uuid, skills -> skills.addXP(skill, xp));
     }
 
     @Override
     public void addAbility(UUID uuid, Ability ability, double quantity) {
-        plugin.getAbilitiesManager().getPlayerAbilities(uuid).addAbility(ability, quantity);
+        this.plugin.getAbilitiesManager().getUpdate(uuid, data -> data.addAbility(ability, quantity));
     }
 
     @Override
     public void addArmorAbility(UUID uuid, Ability ability, double quantity) {
-        plugin.getAbilitiesManager().getPlayerAbilities(uuid).addArmorAbility(ability, quantity);
+        this.plugin.getAbilitiesManager().getUpdate(uuid, data -> data.addArmorAbility(ability, quantity));
     }
 
     @Override
     public void removeArmorAbility(UUID uuid, Ability ability, double quantity) {
-        plugin.getAbilitiesManager().getPlayerAbilities(uuid).removeArmorAbility(ability, quantity);
+        this.plugin.getAbilitiesManager().getUpdate(uuid, data -> data.removeArmorAbility(ability, quantity));
     }
 
     @Override
     public void addArmorPerk(UUID uuid, Perk perk, double quantity) {
-        plugin.getPerksManager().getPlayerPerks(uuid).addArmorPerk(perk, quantity);
+        this.plugin.getPerksManager().getUpdate(uuid, playerPerks -> playerPerks.addArmorPerk(perk, quantity));
     }
 
     @Override
     public void removeArmorPerk(UUID uuid, Perk perk, double quantity) {
-        plugin.getPerksManager().getPlayerPerks(uuid).removeArmorPerk(perk, quantity);
+        this.plugin.getPerksManager().getUpdate(uuid, playerPerks -> playerPerks.removeArmorPerk(perk, quantity));
     }
 
     @Override
     public void setAbility(UUID uuid, Ability ability, double quantity) {
-        plugin.getAbilitiesManager().getPlayerAbilities(uuid).setAbility(ability, quantity);
+        this.plugin.getAbilitiesManager().getUpdate(uuid, data -> data.setAbility(ability, quantity));
     }
 
     @Override
     public void removeAbility(UUID uuid, Ability ability, double quantity) {
-        plugin.getAbilitiesManager().getPlayerAbilities(uuid).removeAbility(ability, quantity);
+        this.plugin.getAbilitiesManager().getUpdate(uuid, data -> data.removeAbility(ability, quantity));
     }
 
     @Override
@@ -109,25 +109,17 @@ public class HyperSkillsAPIImpl implements HyperSkillsAPI {
 
     @Override
     public void setPerk(UUID uuid, Perk perk, double quantity) {
-        plugin.getPerksManager().getPlayerPerks(uuid).setPerk(perk, quantity);
+        this.plugin.getPerksManager().getUpdate(uuid, playerPerks -> playerPerks.setPerk(perk, quantity));
     }
 
     @Override
     public void addPerk(UUID uuid, Perk perk, double quantity) {
-        try {
-            var t = plugin.getPerksManager();
-            var x = t.getPlayerPerks(uuid);
-            x.addPerk(perk, quantity);
-        }catch (Exception e) {
-            var t = plugin.getPerksManager();
-            System.out.println("[DEBUG ADDPERK 1]" + uuid);
-            System.out.println("[DEBUG ADDPERK 2]" + Arrays.toString(t.perksCache.keySet().toArray()));
-        }
+        this.plugin.getPerksManager().getUpdate(uuid, playerPerks -> playerPerks.addPerk(perk, quantity));
     }
 
     @Override
     public void removePerk(UUID uuid, Perk perk, double quantity) {
-        plugin.getPerksManager().getPlayerPerks(uuid).removePerk(perk, quantity);
+        this.plugin.getPerksManager().getUpdate(uuid, playerPerks -> playerPerks.removePerk(perk, quantity));
     }
 
     @Override

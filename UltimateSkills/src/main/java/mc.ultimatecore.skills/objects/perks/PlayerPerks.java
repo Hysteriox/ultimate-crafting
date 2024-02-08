@@ -1,9 +1,11 @@
 package mc.ultimatecore.skills.objects.perks;
 
+import mc.ultimatecore.helper.implementations.object.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerPerks {
+public class PlayerPerks extends DatabaseObject {
 
     private final Map<Perk, Double> playerPerks = new HashMap<>();
 
@@ -51,5 +53,10 @@ public class PlayerPerks {
     public void removeArmorPerk(Perk perk, Double quantity) {
         if (armorPerks.containsKey(perk))
             armorPerks.put(perk, armorPerks.get(perk) - quantity);
+    }
+
+    public void load(PlayerPerks fromObject) {
+        this.playerPerks.putAll(fromObject.playerPerks);
+        this.armorPerks.putAll(fromObject.armorPerks);
     }
 }

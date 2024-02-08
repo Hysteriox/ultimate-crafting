@@ -1,6 +1,6 @@
 package mc.ultimatecore.skills.managers;
 
-import com.cryptomorin.xseries.*;
+import mc.ultimatecore.helper.implementations.object.*;
 import mc.ultimatecore.skills.*;
 import mc.ultimatecore.skills.api.events.*;
 import mc.ultimatecore.skills.listener.perks.*;
@@ -10,27 +10,25 @@ import mc.ultimatecore.skills.objects.xp.*;
 import mc.ultimatecore.skills.utils.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
-import org.bukkit.command.*;
 import org.bukkit.entity.*;
 
 import java.util.*;
+import java.util.function.*;
 
 public class SkillManager {
     public final Map<UUID, TempUser> tempUsers = new HashMap<>();
     private final HyperSkills plugin;
-    private final Set<UUID> _currentlyLoading = new HashSet<>();
     private final Map<UUID, PlayerSkills> skillsCache = new HashMap<>();
     private int task;
     public int playersQuantity;
 
     public SkillManager(HyperSkills plugin) {
         this.plugin = plugin;
-        this.loadPlayerDataOnEnable();
+        Bukkit.getOnlinePlayers().forEach(this::loadPlayerSkills);
         this.updateTop10();
     }
 
     public void disable() {
-        savePlayerDataOnDisable();
         stopUpdating();
     }
 
@@ -41,80 +39,10 @@ public class SkillManager {
 
     private void updateTop10() {
         this.task = Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, () -> {
-            Bukkit.getServer().getOnlinePlayers().forEach(p -> savePlayerData(p, false, false));
+            Bukkit.getServer().getOnlinePlayers().forEach(p -> this.getUpdate(p.getUniqueId(), skills -> {}));
+            this.plugin.getPluginDatabase().saveSkillsDirectly();
             this.updateSkillsTop();
         }, 1200L, 1200L * plugin.getConfiguration().refreshRankingMinutes);
-    }
-
-    public void savePlayerData(Player player, boolean removeFromCache, boolean async) {
-        if (_currentlyLoading.contains(player.getUniqueId())) {
-            return;
-        }
-        UUID uuid = player.getUniqueId();
-        if (async) {
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                PlayerSkills playerSkills = skillsCache.getOrDefault(uuid, null);
-                if (playerSkills != null)
-                    this.plugin.getPluginDatabase().savePlayerSkills(Bukkit.getOfflinePlayer(uuid), playerSkills);
-
-                if (removeFromCache)
-                    skillsCache.remove(player.getUniqueId());
-
-                this.plugin.sendDebug(String.format("Saved data of player %s to database.", player.getName()), DebugType.LOG);
-            });
-        } else {
-            PlayerSkills playerSkills = skillsCache.getOrDefault(uuid, null);
-            if (playerSkills != null)
-                this.plugin.getPluginDatabase().savePlayerSkills(Bukkit.getOfflinePlayer(uuid), playerSkills);
-
-            if (removeFromCache)
-                skillsCache.remove(player.getUniqueId());
-
-            this.plugin.sendDebug(String.format("Saved data of player %s to database.", player.getName()), DebugType.LOG);
-        }
-    }
-
-    private void savePlayerDataOnDisable() {
-        this.plugin.sendDebug("[PLUGIN DISABLE] Saving all player data", DebugType.LOG);
-        for (UUID uuid : skillsCache.keySet()) {
-            if (_currentlyLoading.contains(uuid)) {
-                continue;
-            }
-            PlayerSkills playerSkills = skillsCache.getOrDefault(uuid, null);
-            if (playerSkills != null) {
-                this.plugin.getPluginDatabase().savePlayerSkills(Bukkit.getOfflinePlayer(uuid), playerSkills);
-            }
-        }
-        skillsCache.clear();
-        this.plugin.sendDebug("[PLUGIN DISABLE] Saved all player data to database - skills", DebugType.LOG);
-    }
-
-    public void addIntoTable(Player player) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            this.plugin.getPluginDatabase().addIntoSkillsDatabase(player);
-        });
-    }
-
-    private void loadPlayerDataOnEnable() {
-        Bukkit.getServer().getOnlinePlayers().forEach(this::loadPlayerData);
-    }
-
-    public void loadPlayerData(Player player) {
-        if (_currentlyLoading.contains(player.getUniqueId())) {
-            return;
-        }
-        _currentlyLoading.add(player.getUniqueId());
-        this.plugin.sendDebug(String.format("Attempting to load skills of player %s from database", player.getName()), DebugType.LOG);
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-            try {
-                String strSkills = plugin.getPluginDatabase().getPlayerSkills(player);
-                PlayerSkills playerSkills = strSkills != null ? plugin.getGson().fromStringSkills(strSkills) : new PlayerSkills();
-                skillsCache.put(player.getUniqueId(), playerSkills);
-                this.plugin.sendDebug(String.format("Loaded Skills of player %s from database", player.getName()), DebugType.LOG);
-            } finally {
-                _currentlyLoading.remove(player.getUniqueId());
-            }
-        }, plugin.getConfiguration().syncDelay);
     }
 
     public Integer getLevel(UUID uuid, SkillType key) {
@@ -130,25 +58,6 @@ public class SkillManager {
         return skillsCache.getOrDefault(p.getUniqueId(), new PlayerSkills()).getLevel(key);
     }
 
-    public double getXP(OfflinePlayer p, SkillType key) {
-        return skillsCache.getOrDefault(p.getUniqueId(), new PlayerSkills()).getXP(key);
-    }
-
-    public void setLevel(OfflinePlayer p, SkillType key, int level) {
-        if (p.isOnline())
-            skillsCache.getOrDefault(p.getUniqueId(), new PlayerSkills()).setLevel(key, level);
-    }
-
-    public void setXP(OfflinePlayer p, SkillType key, double xp) {
-        if (p.isOnline())
-            skillsCache.getOrDefault(p.getUniqueId(), new PlayerSkills()).setXP(key, xp);
-    }
-
-    public void addLevel(OfflinePlayer p, SkillType key, int level) {
-        if (p.isOnline())
-            skillsCache.getOrDefault(p.getUniqueId(), new PlayerSkills()).addLevel(key, level);
-    }
-
     public void addXP(UUID uuid, SkillType skillType, double xp) {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) {
@@ -158,75 +67,61 @@ public class SkillManager {
             return;
         }
 
-        PlayerSkills playerSkills = plugin.getSkillManager().getPlayerSkills(player);
-        xp *= Utils.getMultiplier(player, skillType);
-        SkillsXPGainEvent event = new SkillsXPGainEvent(player, skillType, xp);
-        Bukkit.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return;
-        }
-        playerSkills.addXP(skillType, xp);
-        if (plugin.getConfiguration().actionBarXP) {
-            plugin.getActionBarManager().sendXPActionBar(player, skillType, xp);
-        }
-
-        if (playerSkills.getLevel(skillType) >= plugin.getConfiguration().maxSkillLevel) {
-            return;
-        }
-        checkLevelUp(player, skillType);
-    }
-
-    public void setXP(UUID uuid, SkillType skillType, double xp) {
-        Player player = Bukkit.getPlayer(uuid);
-        if (player != null)
-            if (xp != 0D) {
-                PlayerSkills playerSkills = plugin.getSkillManager().getPlayerSkills(player);
-                if (playerSkills.getLevel(skillType) < plugin.getConfiguration().maxSkillLevel) {
-                    playerSkills.setXP(skillType, xp);
-                    if (plugin.getConfiguration().actionBarXP)
-                        plugin.getActionBarManager().sendXPActionBar(player, skillType, xp);
-                    checkLevelUp(player, skillType);
-                }
+        this.getUpdate(player.getUniqueId(), playerSkills -> {
+            double currentXp = xp;
+            currentXp *= Utils.getMultiplier(player, skillType);
+            SkillsXPGainEvent event = new SkillsXPGainEvent(player, skillType, currentXp);
+            Bukkit.getServer().getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                return;
             }
+            playerSkills.addXP(skillType, currentXp);
+            if (plugin.getConfiguration().actionBarXP) {
+                plugin.getActionBarManager().sendXPActionBar(player, skillType, currentXp);
+            }
+
+            if (playerSkills.getLevel(skillType) >= plugin.getConfiguration().maxSkillLevel) {
+                return;
+            }
+            checkLevelUp(player, skillType);
+        });
     }
 
 
     public void checkLevelUp(Player player, SkillType skillType) {
-        PlayerSkills playerSkills = plugin.getSkillManager().getPlayerSkills(player);
-        int level = playerSkills.getLevel(skillType);
-        Double currentXP = playerSkills.getXP(skillType);
-        Double maxXP = plugin.getRequirements().getLevelRequirement(skillType, level);
-        new HyperSound(plugin.getConfiguration().gainXPSound, 1, 1).play(player);
-        if (currentXP < maxXP || maxXP == 0D) {
-            return;
-        }
-        if (level >= plugin.getConfiguration().maxSkillLevel) {
-            return;
-        }
-        SkillsLevelUPEvent event = new SkillsLevelUPEvent(player, skillType, level + 1);
-        Bukkit.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled())
-            return;
-        new HyperSound(plugin.getConfiguration().levelUPSound, 1, 1).play(player);
-        playerSkills.addLevel(skillType, 1);
-        if (currentXP - maxXP > 0) {
-            playerSkills.setXP(skillType, currentXP - maxXP);
-        } else {
-            playerSkills.setXP(skillType, 0d);
-        }
-        levelUp(player, skillType, level);
-        checkLevelUp(player, skillType);
+        this.getUpdate(player.getUniqueId(), playerSkills -> {
+            int level = playerSkills.getLevel(skillType);
+            Double currentXP = playerSkills.getXP(skillType);
+            Double maxXP = plugin.getRequirements().getLevelRequirement(skillType, level);
+            new HyperSound(plugin.getConfiguration().gainXPSound, 1, 1).play(player);
+            if (currentXP < maxXP || maxXP == 0D) {
+                return;
+            }
+            if (level >= plugin.getConfiguration().maxSkillLevel) {
+                return;
+            }
+            SkillsLevelUPEvent event = new SkillsLevelUPEvent(player, skillType, level + 1);
+            Bukkit.getServer().getPluginManager().callEvent(event);
+            if (event.isCancelled())
+                return;
+            new HyperSound(plugin.getConfiguration().levelUPSound, 1, 1).play(player);
+            playerSkills.addLevel(skillType, 1);
+            if (currentXP - maxXP > 0) {
+                playerSkills.setXP(skillType, currentXP - maxXP);
+            } else {
+                playerSkills.setXP(skillType, 0d);
+            }
+            levelUp(player, skillType, level);
+            checkLevelUp(player, skillType);
+        });
+
     }
 
     private void levelUp(Player player, SkillType skill, int level) {
         List<String> commands = plugin.getRewards().getCommandRewards(skill, level);
         if (commands != null) {
             for (String command : commands) {
-                try {
-                    var t = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replaceAll("%player%", player.getName()));
-                } catch (CommandException e) {
-                    e.printStackTrace();
-                }
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replaceAll("%player%", player.getName()));
             }
         }
 
@@ -255,21 +150,48 @@ public class SkillManager {
         }
     }
 
-    public PlayerSkills getPlayerSkills(OfflinePlayer p) {
-        if (!p.isOnline()) {
-            return new PlayerSkills();
-        } else {
-            return skillsCache.getOrDefault(p.getUniqueId(), new PlayerSkills());
+    public void resetData(UUID uuid) {
+        if (skillsCache.containsKey(uuid)) {
+            final PlayerSkills playerSkills = new PlayerSkills();
+            skillsCache.put(uuid, playerSkills);
+            this.plugin.getPluginDatabase().savePlayerSkills(uuid, playerSkills);
         }
     }
 
-    public void resetData(UUID uuid) {
-        if (skillsCache.containsKey(uuid))
-            skillsCache.put(uuid, new PlayerSkills());
+    public PlayerSkills getPlayerSkills(UUID uuid) {
+        PlayerSkills playerSkills = this.skillsCache.get(uuid);
+        if (playerSkills == null) {
+            final PlayerSkills loading = new PlayerSkills();
+            this.skillsCache.put(uuid, loading);
+            this.plugin.getPluginDatabase().loadPlayerSkills(uuid, loading);
+            return loading;
+        }
+        return playerSkills;
     }
 
-    public PlayerSkills getPlayerSkills(UUID uuid) {
-        return skillsCache.getOrDefault(uuid, new PlayerSkills());
+    public void getUpdate(UUID uuid, Consumer<PlayerSkills> abilities) {
+        final PlayerSkills playerSkills = this.skillsCache.get(uuid);
+        if (playerSkills == null) {
+            final PlayerSkills loading = new PlayerSkills();
+            loading.addPendingTask(() -> {
+                abilities.accept(loading);
+                this.plugin.getPluginDatabase().savePlayerSkills(uuid, loading);
+            });
+            this.plugin.getPluginDatabase().loadPlayerSkills(uuid, loading);
+            this.skillsCache.put(uuid, loading);
+            return;
+        }
+
+        if (playerSkills.isLoading()) {
+            playerSkills.addPendingTask(() -> {
+                abilities.accept(playerSkills);
+                this.plugin.getPluginDatabase().savePlayerSkills(uuid, playerSkills);
+            });
+            return;
+        }
+
+        abilities.accept(playerSkills);
+        this.plugin.getPluginDatabase().savePlayerSkills(uuid, playerSkills);
     }
 
     private void updateSkillsTop() {
@@ -360,6 +282,7 @@ public class SkillManager {
             percentage = plugin.getApi().getTotalPerk(player.getUniqueId(), Perk.Crop_Chance);
         } else if (skillType == SkillType.Mining) {
             percentage = plugin.getApi().getTotalPerk(player.getUniqueId(), Perk.Ore_Chance);
+            System.out.println("ORE CHANGE: " + percentage);
         } else if (skillType == SkillType.Foraging) {
             percentage = plugin.getApi().getTotalPerk(player.getUniqueId(), Perk.Log_Chance);
         }
@@ -376,4 +299,17 @@ public class SkillManager {
         plugin.getSkillManager().addXP(player.getUniqueId(), skillType, xp);
     }
 
+    public void remove(UUID uuid) {
+        this.skillsCache.remove(uuid);
+    }
+
+    public void disconnect(Player player) {
+        final PlayerSkills skills = this.skillsCache.get(player.getUniqueId());
+        if (skills == null) return;
+        skills.disconnect();
+    }
+
+    public void loadPlayerSkills(Player player) {
+        this.getUpdate(player.getUniqueId(), DatabaseObject::connect);
+    }
 }

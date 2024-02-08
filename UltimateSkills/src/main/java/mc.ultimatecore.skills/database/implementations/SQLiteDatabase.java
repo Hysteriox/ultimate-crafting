@@ -3,11 +3,7 @@ package mc.ultimatecore.skills.database.implementations;
 import mc.ultimatecore.helper.database.Credentials;
 import mc.ultimatecore.skills.HyperSkills;
 import mc.ultimatecore.skills.database.SQLDatabase;
-import mc.ultimatecore.skills.objects.PlayerSkills;
-import mc.ultimatecore.skills.objects.abilities.PlayerAbilities;
-import mc.ultimatecore.skills.objects.perks.PlayerPerks;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 
 public class SQLiteDatabase extends SQLDatabase {
 
@@ -20,24 +16,24 @@ public class SQLiteDatabase extends SQLDatabase {
 	@Override
 	public void createTables() {
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			execute("CREATE TABLE IF NOT EXISTS " + SKILLS_TABLE_NAME + "(UUID varchar(36) primary key, Data LONGTEXT)");
-			execute("CREATE TABLE IF NOT EXISTS " + PERKS_TABLE_NAME + "(UUID varchar(36) primary key, Data LONGTEXT)");
-			execute("CREATE TABLE IF NOT EXISTS " + ABILITIES_TABLE_NAME +"(UUID varchar(36) primary key, Data LONGTEXT)");
+			execute("CREATE TABLE IF NOT EXISTS Skills (UUID varchar(36) primary key, Data LONGTEXT)");
+			execute("CREATE TABLE IF NOT EXISTS Perks (UUID varchar(36) primary key, Data LONGTEXT)");
+			execute("CREATE TABLE IF NOT EXISTS Abilities (UUID varchar(36) primary key, Data LONGTEXT)");
 		});
 	}
 
-	@Override
-	public void addIntoSkillsDatabase(OfflinePlayer player) {
-		this.execute("INSERT OR IGNORE INTO " + MySQLDatabase.SKILLS_TABLE_NAME + " VALUES(?,?)", player.getUniqueId().toString(), plugin.getGson().toStringSkills(new PlayerSkills()));
-	}
+    @Override
+    public String saveAbilitiesStatement() {
+        return "INSERT INTO Abilities (UUID, Data) VALUES (?,?) ON CONFLICT(UUID) DO UPDATE SET Data=?";
+    }
 
-	@Override
-	public void addIntoAbilitiesDatabase(OfflinePlayer player) {
-		this.execute("INSERT OR IGNORE INTO " + MySQLDatabase.ABILITIES_TABLE_NAME + " VALUES(?,?)", player.getUniqueId().toString(), plugin.getGson().toStringAbilities(new PlayerAbilities()));
-	}
+    @Override
+    public String saveSkillsStatement() {
+        return "INSERT INTO Skills (UUID, Data) VALUES (?,?) ON CONFLICT(UUID) DO UPDATE SET Data=?";
+    }
 
-	@Override
-	public void addIntoPerksDatabase(OfflinePlayer player) {
-		this.execute("INSERT OR IGNORE INTO " + MySQLDatabase.PERKS_TABLE_NAME + " VALUES(?,?)", player.getUniqueId().toString(), plugin.getGson().toStringPerks(new PlayerPerks()));
-	}
+    @Override
+    public String savePerksStatement() {
+        return "INSERT INTO Perks (UUID, Data) VALUES (?,?) ON CONFLICT(UUID) DO UPDATE SET Data=?";
+    }
 }

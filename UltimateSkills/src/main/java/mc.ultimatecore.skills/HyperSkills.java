@@ -92,8 +92,6 @@ public class HyperSkills extends UltimatePlugin {
     @Override
     public void onDisable() {
         if (skillManager != null) skillManager.disable();
-        if (perksManager != null) perksManager.disable();
-        if (abilitiesManager != null) abilitiesManager.disable();
         if (pluginDatabase != null) pluginDatabase.close();
         Bukkit.getServer().getOnlinePlayers().forEach(HumanEntity::closeInventory);
         ultimateItems.save();

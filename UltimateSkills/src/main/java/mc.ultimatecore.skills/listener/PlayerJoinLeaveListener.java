@@ -25,14 +25,11 @@ public class PlayerJoinLeaveListener implements Listener {
                 AttributeUtils.manageAttribute(player, 20, HyperSkills.getInstance());
 
             // Stats
-            plugin.getAbilitiesManager().addIntoTable(event.getPlayer());
-            plugin.getAbilitiesManager().loadPlayerData(event.getPlayer());
+            this.plugin.getAbilitiesManager().loadPlayerAbilities(player);
 
-            plugin.getPerksManager().addIntoTable(event.getPlayer());
-            plugin.getPerksManager().loadPlayerData(event.getPlayer());
+            this.plugin.getPerksManager().loadPlayerAbilities(player);
 
-            plugin.getSkillManager().addIntoTable(event.getPlayer());
-            plugin.getSkillManager().loadPlayerData(event.getPlayer());
+            this.plugin.getSkillManager().loadPlayerSkills(player);
 
             TempUser user = TempUser.getUser(player);
             user.name = player.getName();
@@ -50,10 +47,11 @@ public class PlayerJoinLeaveListener implements Listener {
         try {
             Player player = event.getPlayer();
 
-            plugin.getPerksManager().savePlayerData(player, true, true);
+            plugin.getPerksManager().disconnect(player);
 
-            plugin.getSkillManager().savePlayerData(player, true, true);
+            plugin.getSkillManager().disconnect(player);
 
+            plugin.getAbilitiesManager().disconnect(player);
         } catch (Exception e) {
             HyperSkills.getInstance().sendErrorMessage(e);
         }

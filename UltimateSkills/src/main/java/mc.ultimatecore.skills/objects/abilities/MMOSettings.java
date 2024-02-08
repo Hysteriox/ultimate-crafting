@@ -74,11 +74,12 @@ public class MMOSettings {
         boolean isMMO = HyperSkills.getInstance().getAddonsManager().isMMOItems();
         if(!isMMO) return false;
         if (player == null || !player.isOnline()) return false;
-        PlayerAbilities playerAbilities = HyperSkills.getInstance().getAbilitiesManager().getPlayerAbilities(uuid);
-        for(Ability ability : Ability.values()){
-            HyperSkills.getInstance().getAddonsManager().getMmoItems().updateStats(uuid, ability, playerAbilities.getAbility(ability), "_NORMAL");
-            HyperSkills.getInstance().getAddonsManager().getMmoItems().updateStats(uuid, ability, playerAbilities.getArmorAbility(ability), "_ARMOR");
-        }
+        HyperSkills.getInstance().getAbilitiesManager().getUpdate(uuid, playerAbilities -> {
+            for(Ability ability : Ability.values()){
+                HyperSkills.getInstance().getAddonsManager().getMmoItems().updateStats(uuid, ability, playerAbilities.getAbility(ability), "_NORMAL");
+                HyperSkills.getInstance().getAddonsManager().getMmoItems().updateStats(uuid, ability, playerAbilities.getArmorAbility(ability), "_ARMOR");
+            }
+        });
         return true;
     }
 

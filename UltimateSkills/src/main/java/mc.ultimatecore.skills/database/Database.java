@@ -18,22 +18,25 @@ public abstract class Database extends DatabaseImpl {
 
 	public abstract Set<UUID> getAllPlayers();
 
-	public abstract void addIntoSkillsDatabase(OfflinePlayer player);
-
-	public abstract void addIntoPerksDatabase(OfflinePlayer player);
-
-	public abstract void addIntoAbilitiesDatabase(OfflinePlayer player);
-
 	public abstract String getPlayerSkills(OfflinePlayer player);
 
-	public abstract void savePlayerSkills(OfflinePlayer player, PlayerSkills playerSkills);
+    public abstract void loadPlayerSkills(UUID uuid, PlayerSkills skills);
 
-	public abstract String getPlayerAbilities(OfflinePlayer player);
+	public abstract void savePlayerSkills(UUID uuid, PlayerSkills playerSkills);
 
-	public abstract void savePlayerAbilities(OfflinePlayer player, PlayerAbilities playerAbilities);
+    public abstract void loadPlayerAbilities(UUID uuid, PlayerAbilities playerAbilities);
 
-	public abstract String getPlayerPerks(OfflinePlayer player);
+    public abstract void savePlayerAbilities(UUID uuid, PlayerAbilities playerAbilities);
 
-	public abstract void savePlayerPerks(OfflinePlayer player, PlayerPerks playerPerks);
+    public abstract void loadPlayerPerks(UUID uuid, PlayerPerks playerPerks);
 
+    public abstract void savePlayerPerks(UUID uuid, PlayerPerks playerPerks);
+
+    public abstract String saveAbilitiesStatement();
+
+    public abstract String saveSkillsStatement();
+
+    public abstract String savePerksStatement();
+
+    public abstract void saveSkillsDirectly();
 }

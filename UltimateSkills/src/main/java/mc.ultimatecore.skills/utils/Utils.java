@@ -148,7 +148,7 @@ public final class Utils {
     }
 
     public static List<Placeholder> getStatsPlaceholders(UUID uuid) {
-        return new ArrayList<Placeholder>() {{
+        return new ArrayList<>() {{
             add(new Placeholder("player", Bukkit.getOfflinePlayer(uuid).getName()));
             for (Ability ability : Ability.values()) {
                 double base = HyperSkills.getInstance().getApi().getSimpleAbility(uuid, ability);

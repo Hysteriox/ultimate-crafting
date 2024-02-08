@@ -7,16 +7,21 @@ import mc.ultimatecore.helper.database.Credentials;
 import mc.ultimatecore.helper.database.DatabaseType;
 import mc.ultimatecore.helper.database.implementations.MySQL;
 import mc.ultimatecore.helper.database.implementations.SQLite;
+import mc.ultimatecore.helper.implementations.object.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
 
 @RequiredArgsConstructor
 public abstract class DatabaseImpl {
     
     protected HikariDataSource hikari;
     protected final UltimatePlugin plugin;
+    private final List<DatabaseTask<?>> tasks = new ArrayList<>();
     
     public abstract void createTables();
     
@@ -30,9 +35,16 @@ public abstract class DatabaseImpl {
         this.createTables();
         
     }
-    
+
+    public <V extends DatabaseObject> DatabaseTask<V> addTask(DatabaseTaskHandler<V> taskHandler) {
+        final DatabaseTask<V> task = new DatabaseTask<>(this, taskHandler);
+        this.tasks.add(task);
+        return task;
+    }
+
     public void close() {
         if (this.hikari != null) {
+            this.tasks.forEach(DatabaseTask::close);
             this.hikari.close();
             this.plugin.getLogger().info("Closing SQL Connection");
         }

@@ -1,5 +1,6 @@
 package mc.ultimatecore.skills.objects;
 
+import mc.ultimatecore.helper.implementations.object.*;
 import mc.ultimatecore.skills.implementations.Levellable;
 
 import java.util.HashMap;
@@ -7,7 +8,7 @@ import java.util.Map;
 
 ;
 
-public class PlayerSkills implements Levellable {
+public class PlayerSkills extends DatabaseObject implements Levellable {
 
     private final Map<SkillType, Integer> playerLevel = new HashMap<>();
 
@@ -82,5 +83,11 @@ public class PlayerSkills implements Levellable {
     public void setRankPosition(SkillType skillType, int value){
         if(rankPosition.containsKey(skillType))
             rankPosition.put(skillType, value);
+    }
+
+    public void load(PlayerSkills fromObject) {
+        this.playerLevel.putAll(fromObject.playerLevel);
+        this.playerXP.putAll(fromObject.playerXP);
+        this.rankPosition.putAll(fromObject.rankPosition);
     }
 }
