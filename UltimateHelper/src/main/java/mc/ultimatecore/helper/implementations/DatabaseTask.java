@@ -43,12 +43,12 @@ public class DatabaseTask<V extends DatabaseObject> {
                 ResultSet resultSet = statement.executeQuery();
                 if (resultSet.next()) {
                     this.taskHandler.load(uuid, data, resultSet);
-                    Runnable runnable;
-                    while ((runnable = data.getPendingLoadTasks().poll()) != null) {
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(this.impl.plugin, runnable);
-                    }
-                    data.releaseLoading();
                 }
+                Runnable runnable;
+                while ((runnable = data.getPendingLoadTasks().poll()) != null) {
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(this.impl.plugin, runnable);
+                }
+                data.releaseLoading();
             }
         } catch (SQLException e) {
             throw new RuntimeException("An error occurred while loading data", e);
@@ -83,13 +83,5 @@ public class DatabaseTask<V extends DatabaseObject> {
         if (object.isLoading()) return;
         object.setLoading();
         this.loadQueue.add(new QueueingObject<>(uuid, object));
-    }
-
-    public int loadSize() {
-        return this.loadQueue.size();
-    }
-
-    public int saveSize() {
-        return this.saveQueue.size();
     }
 }
