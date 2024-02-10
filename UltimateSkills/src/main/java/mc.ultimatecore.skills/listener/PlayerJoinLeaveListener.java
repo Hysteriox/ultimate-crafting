@@ -26,9 +26,7 @@ public class PlayerJoinLeaveListener implements Listener {
 
             // Stats
             this.plugin.getAbilitiesManager().loadPlayerAbilities(player);
-
-            this.plugin.getPerksManager().loadPlayerAbilities(player);
-
+            this.plugin.getPerksManager().loadPlayerPerks(player);
             this.plugin.getSkillManager().loadPlayerSkills(player);
 
             TempUser user = TempUser.getUser(player);

@@ -60,15 +60,15 @@ public class DamageListener implements Listener {
     private void manageDamage(Player player, EntityDamageByEntityEvent e){
         IndicatorType indicatorType = IndicatorType.NORMAL;
         //Critic Damage and Critic Chance
-        int per = (int) plugin.getApi().getTotalAbility(player.getUniqueId(), Ability.CRIT_CHANCE);
+        int per = (int) plugin.getApi().getTotalAbility(player.getUniqueId(), Ability.Crit_Chance);
         int random = new Random().nextInt(100);
         double finalDamage = e.getDamage();
         if(random <= per) {
-            finalDamage+=plugin.getApi().getTotalAbility(player.getUniqueId(), Ability.CRIT_DAMAGE);
+            finalDamage+=plugin.getApi().getTotalAbility(player.getUniqueId(), Ability.Crit_Damage);
             indicatorType = IndicatorType.CRITIC;
         }
         //Strength
-        double strength = plugin.getApi().getTotalAbility(player.getUniqueId(), Ability.STRENGTH);
+        double strength = plugin.getApi().getTotalAbility(player.getUniqueId(), Ability.Strength);
         if(strength >= 5)
             finalDamage+=(int) (strength / 5);
         e.setDamage(finalDamage);

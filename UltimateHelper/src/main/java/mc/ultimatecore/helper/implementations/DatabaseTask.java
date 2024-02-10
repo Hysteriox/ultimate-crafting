@@ -84,4 +84,12 @@ public class DatabaseTask<V extends DatabaseObject> {
         object.setLoading();
         this.loadQueue.add(new QueueingObject<>(uuid, object));
     }
+
+    public int loadSize() {
+        return this.loadQueue.size();
+    }
+
+    public int saveSize() {
+        return this.saveQueue.size();
+    }
 }

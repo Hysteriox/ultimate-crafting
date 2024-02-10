@@ -282,7 +282,6 @@ public class SkillManager {
             percentage = plugin.getApi().getTotalPerk(player.getUniqueId(), Perk.Crop_Chance);
         } else if (skillType == SkillType.Mining) {
             percentage = plugin.getApi().getTotalPerk(player.getUniqueId(), Perk.Ore_Chance);
-            System.out.println("ORE CHANGE: " + percentage);
         } else if (skillType == SkillType.Foraging) {
             percentage = plugin.getApi().getTotalPerk(player.getUniqueId(), Perk.Log_Chance);
         }

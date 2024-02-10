@@ -16,10 +16,10 @@ public class PerksManager {
 
     public PerksManager(HyperSkills plugin) {
         this.plugin = plugin;
-        Bukkit.getServer().getOnlinePlayers().forEach(this::loadPlayerAbilities);
+        Bukkit.getServer().getOnlinePlayers().forEach(this::loadPlayerPerks);
     }
 
-    public void loadPlayerAbilities(Player player) {
+    public void loadPlayerPerks(Player player) {
         this.getUpdate(player.getUniqueId(), DatabaseObject::connect);
     }
 

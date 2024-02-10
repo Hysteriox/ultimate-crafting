@@ -3,7 +3,6 @@ package mc.ultimatecore.skills.objects.abilities;
 import mc.ultimatecore.skills.HyperSkills;
 import mc.ultimatecore.skills.objects.ManaSettings;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.UUID;
@@ -28,14 +27,14 @@ public class PlayerMana {
         if (!HyperSkills.getInstance().getConfiguration().manaSystem)
             return false;
         HyperSkills.getInstance().getAbilitiesManager().getUpdate(uuid, playerAbilities -> {
-            double maxMana = HyperSkills.getInstance().getApi().getTotalAbility(uuid, Ability.MAX_INTELLIGENCE);
-            double currentMana = HyperSkills.getInstance().getApi().getTotalAbility(uuid, Ability.INTELLIGENCE);
+            double maxMana = HyperSkills.getInstance().getApi().getTotalAbility(uuid, Ability.Max_Intelligence);
+            double currentMana = HyperSkills.getInstance().getApi().getTotalAbility(uuid, Ability.Intelligence);
             double amount = (manaSettings.getPercentagePerSecond() * maxMana) / 100;
             double newMana = currentMana + amount;
             if(currentMana > maxMana)
-                playerAbilities.setAbility(Ability.INTELLIGENCE, maxMana);
+                playerAbilities.setAbility(Ability.Intelligence, maxMana);
             if(currentMana < maxMana)
-                playerAbilities.setAbility(Ability.INTELLIGENCE, Math.min(newMana, maxMana));
+                playerAbilities.setAbility(Ability.Intelligence, Math.min(newMana, maxMana));
         });
         return true;
     }

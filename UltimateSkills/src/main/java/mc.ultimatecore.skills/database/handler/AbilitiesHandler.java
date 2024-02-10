@@ -52,6 +52,7 @@ public class AbilitiesHandler extends DatabaseHandler<PlayerAbilities> {
         }
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return;
+
         Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().callEvent(new PlayerEnterEvent(player)));
         this.plugin.sendDebug(String.format("Loaded abilities of player %s from database", player.getName()), DebugType.LOG);
     }

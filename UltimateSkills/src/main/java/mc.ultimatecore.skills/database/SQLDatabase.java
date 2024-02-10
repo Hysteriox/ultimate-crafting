@@ -3,7 +3,6 @@ package mc.ultimatecore.skills.database;
 import mc.ultimatecore.helper.implementations.*;
 import mc.ultimatecore.skills.HyperSkills;
 import mc.ultimatecore.skills.database.handler.*;
-import mc.ultimatecore.skills.database.implementations.MySQLDatabase;
 import mc.ultimatecore.skills.objects.PlayerSkills;
 import mc.ultimatecore.skills.objects.abilities.PlayerAbilities;
 import mc.ultimatecore.skills.objects.perks.PlayerPerks;
@@ -19,8 +18,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public abstract class SQLDatabase extends Database {
-
-	public static final String SKILLS_UUID_COLNAME = "UUID";
 
 	protected HyperSkills plugin;
     private final DatabaseTask<PlayerAbilities> abilitiesTask;
