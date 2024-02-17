@@ -81,15 +81,14 @@ public class HyperSkillsAPIImpl implements HyperSkillsAPI {
 
     @Override
     public double getTotalAbility(UUID uuid, Ability ability) {
-        double simpleAbility = getSimpleAbility(uuid, ability);
-        double extraAbility = getExtraAbility(uuid, ability);
-        double total = Math.max(0, simpleAbility + extraAbility);
-        if (plugin.getAddonsManager().isMMOItems()) {
-            if(ability == Ability.Health) {
-                total += plugin.getAddonsManager().getMmoItems().getStats(uuid, ability);
-            }
+        if (this.plugin.getAddonsManager().isMMOItems()) {
+            return ability == Ability.Health ? this.plugin.getAddonsManager().getMmoItems().getStats(uuid, ability) + 80.0 : this.plugin.getAddonsManager().getMmoItems().getStats(uuid, ability);
+        } else {
+            double simpleAbility = this.getSimpleAbility(uuid, ability);
+            double extraAbility = this.getExtraAbility(uuid, ability);
+            double total = Math.max(0.0, simpleAbility + extraAbility);
+            return ability == Ability.Health ? total + 100.0 : total;
         }
-        return ability == Ability.Health ? total + 80 : total;
     }
 
 

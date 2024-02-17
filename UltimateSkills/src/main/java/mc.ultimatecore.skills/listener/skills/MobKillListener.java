@@ -1,6 +1,6 @@
 package mc.ultimatecore.skills.listener.skills;
 
-import io.lumine.mythic.api.mobs.*;
+import io.lumine.xikage.mythicmobs.mobs.*;
 import lombok.AllArgsConstructor;
 import mc.ultimatecore.skills.HyperSkills;
 import mc.ultimatecore.skills.objects.Skill;
