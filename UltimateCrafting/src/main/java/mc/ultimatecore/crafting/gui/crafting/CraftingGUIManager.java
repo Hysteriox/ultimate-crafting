@@ -35,6 +35,7 @@ public class CraftingGUIManager {
     }
 
     public void updateRecipeSlots() {
+        System.out.println("UPDATING RECIPE SLOTS");
         // Clear previous recipe slots
         recipeSlots.clear();
         for (int slot : plugin.getInventories().availableRecipesSlots) {
@@ -43,6 +44,7 @@ public class CraftingGUIManager {
 
         List<Integer> slots = plugin.getInventories().availableRecipesSlots;
         if (plugin.getConfiguration().showAvailableRecipes && player.hasPermission("hypercrafting.autorecipes")) {
+            System.out.println("SHOWING AVAILABLE RECIPES");
             List<CraftingRecipe> craftingRecipes = getQuickCraftingRecipes(player, slots.size());
 
             int index = 0;
@@ -113,11 +115,13 @@ public class CraftingGUIManager {
     }
 
     void updateActiveRecipe() {
+        System.out.println("UPDATING ACTIVE RECIPE");
         HashMap<Integer, ItemStack> items = this.getCraftingItems();
         this.activeRecipe = plugin.getCraftingRecipes().matchRecipe(player, items).orElse(null); // Update recipe
         this.isVanilla = false;
 
         if (this.activeRecipe != null) {
+            System.out.println("ACTIVE RECIPE IS NOT NULL");
             return;
         }
 
@@ -127,7 +131,9 @@ public class CraftingGUIManager {
         }
 
         Recipe recipe = this.plugin.getVanillaSource().getRecipe(itemArray, player.getWorld());
+        System.out.println("OBTAINING NEW ACTIVE RECIPE: " + recipe);
         if (recipe != null) {
+            System.out.println("UPDATED ACTIVE RECIPE");
             this.activeRecipe = new CraftingRecipe("Vanilla", recipe.getResult(), this.plugin);
             this.isVanilla = true;
         }
@@ -148,12 +154,14 @@ public class CraftingGUIManager {
     }
 
     private void craft(boolean onCursor, boolean quickCraft, CraftingRecipe recipe) {
+        System.out.println("CRAFTING");
         if (recipe == null) {
             return;
         }
 
         // If using normal crafting, remove items from the crafting inventory
         if (isVanilla) {
+            System.out.println("VANILLA CRAFTING");
             ItemStack[] itemArray = new ItemStack[9];
             for (Map.Entry<Integer, ItemStack> item : this.getCraftingItems().entrySet()) {
                 itemArray[item.getKey()] = item.getValue();
@@ -162,16 +170,21 @@ public class CraftingGUIManager {
             ItemStack[] items = this.plugin.getVanillaSource().getRemainingItemsForCrafting(itemArray, player.getWorld());
             updateVanillaRecipeCrafingItems(items);
         } else {
+            System.out.println("NOT VANILLA CRAFTING");
             if (!quickCraft) {
+                System.out.println("REMOVED RECIPE ITEM");
                 this.removeRecipeItems(recipe);
             } else {
+                System.out.println("REMOVED PLAYER ITEMS");
                 removePlayerItems(recipe);
             }
         }
 
+        System.out.println("CHECKING RECIPE RESULT");
         ItemStack result = recipe.getResult().clone();
         Bukkit.getServer().getPluginManager().callEvent(new HyperCraftEvent(player, result));
         if (onCursor) {
+            System.out.println("ON CUSROR");
             // Attempt to stack items on the cursor
             ItemStack newStack = InventoryUtils.stackitem(result, player.getItemOnCursor());
             if (newStack != null) {
@@ -184,6 +197,7 @@ public class CraftingGUIManager {
                 }.runTask(plugin);
             }
         } else {
+            System.out.println("NOT ON CURSOR");
             player.getInventory().addItem(result).forEach((k, v) -> player.getWorld().dropItemNaturally(player.getLocation(), v));
         }
 

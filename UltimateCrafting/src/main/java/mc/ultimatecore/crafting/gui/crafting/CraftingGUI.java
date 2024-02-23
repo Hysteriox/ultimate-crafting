@@ -92,11 +92,13 @@ public class CraftingGUI implements SimpleGUI {
     @Override
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
+        System.out.println("MAIN MENU CLICK");
 
         int slot = event.getSlot();
         ClickType clickType = event.getClick();
         ItemStack cursor = event.getCursor();
         if (slot == this.inventoryConfig.closeButton.slot) {
+            System.out.println("CLOSED");
             event.setCancelled(true);
             player.closeInventory();
             return;
@@ -110,18 +112,22 @@ public class CraftingGUI implements SimpleGUI {
 
         // Handle crafting items by directly clicking on recipes
         CraftingRecipe recipe = this.guiManager.getRecipeSlot(slot);
+        System.out.println("Obtaining Recipe: " + recipe);
         if (recipe != null && this.plugin.getConfiguration().showAvailableRecipes && player.hasPermission("hypercrafting.autorecipes") && clickType.isLeftClick()) {
             // Don't allow the player to pickup recipe slots if it's normally impossible
             if (!InventoryUtils.canStackitem(recipe.getResult(), cursor)) {
+                System.out.println("CANT STACK ITEM");
                 return;
             }
 
             if (event.isShiftClick()) {
+                System.out.println("SHIFT CLICK");
                 // Attempt to craft until there is no valid recipe
                 while (this.guiManager.canQuickCraft(slot)) {
                     this.guiManager.quickCraft(recipe, false);
                 }
             } else {
+                System.out.println("NOT SHIFT CLICK");
                 this.guiManager.quickCraft(recipe, true);
             }
 

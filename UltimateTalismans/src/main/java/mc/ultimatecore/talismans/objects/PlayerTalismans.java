@@ -25,6 +25,8 @@ public class PlayerTalismans {
         startCountingMovement(player);
         startCountingTimers(player);
         startCounting(player);
+        Set<String> normalTalismans = Utils.getInventoryTalismans(player, talisman -> talisman instanceof StatsTalisman);
+        this.normalTalismans.addAll(normalTalismans);
     }
 
     private void startCountingTimers(Player player) {

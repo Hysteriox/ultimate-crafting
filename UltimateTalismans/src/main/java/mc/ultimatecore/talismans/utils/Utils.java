@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.function.*;
 
 public final class Utils {
     private static final TreeMap<Integer, String> map = new TreeMap<>();
@@ -58,7 +59,11 @@ public final class Utils {
         return map;
     }
 
-    public static Set<String> getInventoryTalismans(Player player){
+    public static Set<String> getInventoryTalismans(Player player) {
+        return getInventoryTalismans(player, null);
+    }
+
+    public static Set<String> getInventoryTalismans(Player player, Predicate<Talisman> predicate) {
         Set<String> talismans = new HashSet<>();
         for (ItemStack itemStack : player.getInventory().getContents()) {
             if(itemStack == null) continue;
@@ -68,11 +73,13 @@ public final class Utils {
             String name = nbtItem.getString("uc_talisman_name");
             Talisman talisman = HyperTalismans.getInstance().getTalismans().getTalisman(name);
             if(talisman == null) continue;
+            if (predicate != null && !predicate.test(talisman)) continue;
             talismans.add(name);
         }
         for(String id : HyperTalismans.getInstance().getUserManager().getBagTalismans(player.getUniqueId()).getTalismans()){
             Talisman talisman = HyperTalismans.getInstance().getTalismans().getTalisman(id);
             if(talisman == null) continue;
+            if (predicate != null && !predicate.test(talisman)) continue;
             talismans.add(id);
         }
         return talismans;

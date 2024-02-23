@@ -28,11 +28,23 @@ public class v1_16_R3 implements VanillaCraftingSource {
     }
 
     private Optional<RecipeCrafting> getNMSRecipe(ItemStack[] craftingMatrix, InventoryCrafting inventoryCrafting, CraftWorld world) {
+        Object[] formatted = new String[craftingMatrix.length];
         for (int i = 0; i < craftingMatrix.length; ++i) {
-            inventoryCrafting.setItem(i, CraftItemStack.asNMSCopy(craftingMatrix[i]));
+            final ItemStack itemStack = craftingMatrix[i];
+            formatted[i] = itemStack == null ? "Air" : itemStack.getType().name();
+            inventoryCrafting.setItem(i, CraftItemStack.asNMSCopy(itemStack));
         }
 
-        return MinecraftServer.getServer().getCraftingManager().craft(Recipes.CRAFTING, inventoryCrafting, world.getHandle());
+        System.out.printf("""
+                MATRIX\s
+                 > [%s] [%s] [%s]
+                 > [%s] [%s] [%s]
+                 > [%s] [%s] [%s]
+                %n""", formatted);
+
+        Optional<RecipeCrafting> recipeCrafting = MinecraftServer.getServer().getCraftingManager().craft(Recipes.CRAFTING, inventoryCrafting, world.getHandle());
+        System.out.println("Recipe Crafting: " + recipeCrafting.orElse(null));
+        return recipeCrafting;
     }
 
     @Override
