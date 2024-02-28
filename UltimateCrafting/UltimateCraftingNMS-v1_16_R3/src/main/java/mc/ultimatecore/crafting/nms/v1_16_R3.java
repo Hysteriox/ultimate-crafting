@@ -35,16 +35,14 @@ public class v1_16_R3 implements VanillaCraftingSource {
             inventoryCrafting.setItem(i, CraftItemStack.asNMSCopy(itemStack));
         }
 
-        System.out.printf("""
+        /*System.out.printf("""
                 MATRIX\s
                  > [%s] [%s] [%s]
                  > [%s] [%s] [%s]
                  > [%s] [%s] [%s]
-                %n""", formatted);
+                %n""", formatted);*/
 
-        Optional<RecipeCrafting> recipeCrafting = MinecraftServer.getServer().getCraftingManager().craft(Recipes.CRAFTING, inventoryCrafting, world.getHandle());
-        System.out.println("Recipe Crafting: " + recipeCrafting.orElse(null));
-        return recipeCrafting;
+        return MinecraftServer.getServer().getCraftingManager().craft(Recipes.CRAFTING, inventoryCrafting, world.getHandle());
     }
 
     @Override

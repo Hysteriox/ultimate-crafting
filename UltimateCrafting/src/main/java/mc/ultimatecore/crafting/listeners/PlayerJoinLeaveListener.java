@@ -6,7 +6,7 @@ import mc.ultimatecore.crafting.playerdata.User;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 
 @AllArgsConstructor
@@ -27,5 +27,10 @@ public class PlayerJoinLeaveListener implements Listener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        this.plugin.getPlayerManager().getUserIfPresent(event.getPlayer().getUniqueId()).ifPresent(user -> user.getCraftingGUI().connect(event.getPlayer()));
     }
 }

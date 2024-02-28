@@ -20,6 +20,10 @@ public class PlayerManager {
         return users.computeIfAbsent(uuid, x -> new User(uuid, this.plugin));
     }
 
+    public Optional<User> getUserIfPresent(UUID uuid) {
+        return Optional.ofNullable(this.users.get(uuid));
+    }
+
     public void removeUser(UUID uuid) {
         this.users.remove(uuid);
     }
