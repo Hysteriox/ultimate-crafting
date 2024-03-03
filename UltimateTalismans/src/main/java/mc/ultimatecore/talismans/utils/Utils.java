@@ -76,7 +76,8 @@ public final class Utils {
             if (predicate != null && !predicate.test(talisman)) continue;
             talismans.add(name);
         }
-        for(String id : HyperTalismans.getInstance().getUserManager().getBagTalismans(player.getUniqueId()).getTalismans()){
+        List<String> bagTalismans = HyperTalismans.getInstance().getUserManager().getBagTalismans(player.getUniqueId()).getTalismans();
+        for(String id : bagTalismans) {
             Talisman talisman = HyperTalismans.getInstance().getTalismans().getTalisman(id);
             if(talisman == null) continue;
             if (predicate != null && !predicate.test(talisman)) continue;

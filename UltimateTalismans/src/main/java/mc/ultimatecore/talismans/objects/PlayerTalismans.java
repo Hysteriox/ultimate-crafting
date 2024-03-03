@@ -15,18 +15,16 @@ public class PlayerTalismans {
     private int emeraldTask;
     private int countTask;
     private Set<String> normalTalismans;
-    private final Set<String> bagTalismans;
     private final HyperTalismans plugin = HyperTalismans.getInstance();
 
     public PlayerTalismans(Player player) {
         this.uuid = player.getUniqueId();
         this.normalTalismans = new HashSet<>();
-        this.bagTalismans = new HashSet<>();
+        Set<String> normalTalismans = Utils.getInventoryTalismans(player, talisman -> talisman instanceof StatsTalisman);
+        this.normalTalismans.addAll(normalTalismans);
         startCountingMovement(player);
         startCountingTimers(player);
         startCounting(player);
-        Set<String> normalTalismans = Utils.getInventoryTalismans(player, talisman -> talisman instanceof StatsTalisman);
-        this.normalTalismans.addAll(normalTalismans);
     }
 
     private void startCountingTimers(Player player) {
@@ -173,13 +171,5 @@ public class PlayerTalismans {
 
     public Set<String> getNormalTalismans() {
         return normalTalismans;
-    }
-
-    public void setNormalTalismans(Set<String> normalTalismans) {
-        this.normalTalismans = normalTalismans;
-    }
-
-    public Set<String> getBagTalismans() {
-        return bagTalismans;
     }
 }

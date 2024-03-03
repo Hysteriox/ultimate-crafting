@@ -5,7 +5,6 @@ import mc.ultimatecore.talismans.HyperTalismans;
 import mc.ultimatecore.talismans.api.events.PlayerEnterEvent;
 import mc.ultimatecore.talismans.objects.InventoryTalisman;
 import mc.ultimatecore.talismans.objects.PlayerTalismans;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -22,7 +21,6 @@ public class TalismanManager implements Listener {
 
     public TalismanManager(HyperTalismans plugin) {
         plugin.registerListeners(this);
-        loadAllPlayers();
     }
 
     @EventHandler
@@ -45,10 +43,6 @@ public class TalismanManager implements Listener {
         if(!playerTalismans.containsKey(uuid)) return;
         playerTalismans.get(uuid).stop();
         playerTalismans.remove(uuid);
-    }
-
-    private void loadAllPlayers(){
-        Bukkit.getOnlinePlayers().forEach(player -> playerTalismans.put(player.getUniqueId(), new PlayerTalismans(player)));
     }
 
     public InventoryTalisman getTalisman(UUID uuid){
