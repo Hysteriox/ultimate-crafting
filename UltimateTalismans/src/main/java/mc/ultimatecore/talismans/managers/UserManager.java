@@ -1,5 +1,6 @@
 package mc.ultimatecore.talismans.managers;
 
+import com.google.common.collect.*;
 import mc.ultimatecore.talismans.HyperTalismans;
 import mc.ultimatecore.talismans.api.events.PlayerEnterEvent;
 import mc.ultimatecore.talismans.gui.TalismanBagGUI;
@@ -9,13 +10,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 public class UserManager {
     private final HyperTalismans plugin;
-    private final Set<UUID> _currentlyLoading = new HashSet<>();
-
+    private final Set<UUID> _currentlyLoading = Sets.newConcurrentHashSet();
     private final Map<UUID, BagTalismans> bagCache = new HashMap<>();
     private final Map<UUID, TalismanBagGUI> gui = new HashMap<>();
+    private CountDownLatch savingCacheFuture;
 
     public UserManager(HyperTalismans plugin) {
         this.plugin = plugin;
@@ -50,13 +52,13 @@ public class UserManager {
 
     private void savePlayerDataOnDisable() {
         this.plugin.sendDebug("[PLUGIN DISABLE] Saving all player data", DebugType.LOG);
-        for (UUID uuid : bagCache.keySet()) {
-            if(_currentlyLoading.contains(uuid)) return;
-
-            if (bagCache.containsKey(uuid)) {
-                this.plugin.getPluginDatabase().setBagTalismans(Bukkit.getOfflinePlayer(uuid), bagCache.get(uuid).getTalismans());
-            }
+        if (!_currentlyLoading.isEmpty()) {
+            this.plugin.sendDebug("[PLUGIN DISABLE] Waiting for loading players to end", DebugType.LOG);
+            final CountDownLatch latch = new CountDownLatch(1);
+            this.savingCacheFuture = latch;
+            latch.countDown();
         }
+        bagCache.values().forEach((bagTalismans) -> this.plugin.getPluginDatabase().setBagTalismans(Bukkit.getOfflinePlayer(bagTalismans.getUuid()), bagTalismans.getTalismans()));
         bagCache.clear();
         this.plugin.sendDebug("[PLUGIN DISABLE] Saved all player data to database - talismans", DebugType.LOG);
     }
@@ -83,18 +85,27 @@ public class UserManager {
                 Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().callEvent(new PlayerEnterEvent(player)));
                 this.plugin.sendDebug(String.format("Loaded talismans of player %s from database", player.getName()), DebugType.LOG);
             } finally {
-                _currentlyLoading.remove(player.getUniqueId());
+                this.checkSave(player.getUniqueId());
             }
         }, plugin.getConfiguration().syncDelay);
     }
 
+    private void checkSave(UUID uniqueId) {
+        _currentlyLoading.remove(uniqueId);
+        if (_currentlyLoading.isEmpty() && this.savingCacheFuture != null) {
+            this.savingCacheFuture.countDown();
+            this.savingCacheFuture = null;
+        }
+    }
+
 
     public BagTalismans getBagTalismans(UUID uuid) {
-        return bagCache.computeIfAbsent(uuid, BagTalismans::new);
+        if (uuid == null) throw new IllegalStateException("UUID SHOULD NOT BE NULL");
+        return bagCache.computeIfAbsent(uuid, id -> new BagTalismans(uuid, new ArrayList<>()));
     }
 
     public TalismanBagGUI getGUI(UUID uuid) {
-        if (!gui.containsKey(uuid)) gui.put(uuid, new TalismanBagGUI(uuid, this.plugin));
+        if (!gui.containsKey(uuid)) gui.put(uuid, new TalismanBagGUI(this.plugin));
         return gui.get(uuid);
     }
 }

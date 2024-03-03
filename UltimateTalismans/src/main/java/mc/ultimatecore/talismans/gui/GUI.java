@@ -25,10 +25,6 @@ public abstract class GUI {
             getInventory().setItem(i, itemStack);
     }
 
-    protected abstract void onInventoryClick(InventoryClickEvent e);
-
-    protected abstract void onInventoryClose(InventoryCloseEvent e);
-
     protected void addItems(){
         plugin.getInventories().decorationSlots.forEach(slot ->  setItem(slot, InventoryUtils.makeItem(plugin.getInventories().background)));
         setItem(plugin.getInventories().closeButton.slot, InventoryUtils.makeItem(plugin.getInventories().closeButton));

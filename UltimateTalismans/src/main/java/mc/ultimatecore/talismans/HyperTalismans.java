@@ -12,6 +12,7 @@ import mc.ultimatecore.talismans.configs.Talismans;
 import mc.ultimatecore.talismans.database.Database;
 import mc.ultimatecore.talismans.database.implementations.MySQLDatabase;
 import mc.ultimatecore.talismans.database.implementations.SQLiteDatabase;
+import mc.ultimatecore.talismans.gui.*;
 import mc.ultimatecore.talismans.listener.BlockPlaceListener;
 import mc.ultimatecore.talismans.listener.DamageListener;
 import mc.ultimatecore.talismans.listener.HealthListener;
@@ -58,7 +59,7 @@ public class HyperTalismans extends UltimatePlugin {
         this.userManager = new UserManager(this);
         this.commandManager = new CommandManager(this);
         this.talismanManager = new TalismanManager(this);
-        registerListeners(new PlayerJoinLeaveListener(this), new HealthListener(), new DamageListener(), new BlockPlaceListener());
+        registerListeners(new TalismanBagListener(this), new PlayerJoinLeaveListener(this), new HealthListener(), new DamageListener(), new BlockPlaceListener());
         Bukkit.getConsoleSender().sendMessage(StringUtils.color("&e" + getDescription().getName() + " Has been enabled!"));
     }
     

@@ -11,12 +11,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 public class BagTalismans {
     @Getter
     private final UUID uuid;
     @Getter
-    private List<String> talismans = new ArrayList<>();
+    private List<String> talismans;
+
+    public BagTalismans(UUID uuid, List<String> talismans) {
+        this.uuid = uuid;
+        this.talismans = talismans;
+    }
 
     public void setTalismans(List<String> talismans){
         this.talismans = talismans;
