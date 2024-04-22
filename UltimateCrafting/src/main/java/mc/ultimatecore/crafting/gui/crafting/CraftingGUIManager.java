@@ -50,9 +50,7 @@ public class CraftingGUIManager {
                 try {
                     CraftingRecipe craftingRecipe = craftingRecipes.get(index);
                     recipeSlots.put(slot, craftingRecipe);
-                    for (int i = 0; i < 40; i++) {
-                        inventory.setItem(slot, InventoryUtils.makeItem(plugin.getInventories().previewCraftItem, craftingRecipe.getResult(), "autoRecipes"));
-                    }
+                    inventory.setItem(slot, InventoryUtils.makeItem(plugin.getInventories().previewCraftItem, craftingRecipe.getResult(), "autoRecipes"));
                 } catch (IndexOutOfBoundsException e) {
                 }
                 index++;
@@ -61,9 +59,6 @@ public class CraftingGUIManager {
 
     }
 
-
-    private static long totalTimeElapsed;
-    private static long timeElapsedCount;
 
     // Get valid recipes that the player can currently craft.
     private List<CraftingRecipe> getQuickCraftingRecipes(Player player, int amount) {
@@ -94,9 +89,6 @@ public class CraftingGUIManager {
             // Ibramsou End
             craftingRecipes.add(craftingRecipe);
         }
-        totalTimeElapsed += System.currentTimeMillis() - start;
-        timeElapsedCount++;
-        System.out.println("AVERAGE: " + totalTimeElapsed / timeElapsedCount + "ms");
         return craftingRecipes;
     }
 
