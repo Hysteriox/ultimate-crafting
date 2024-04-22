@@ -74,6 +74,7 @@ public class RecipeCreatorGUI extends GUI implements Listener {
                 craftingRecipe.getRecipeItems().put(i, inventory.getItem(i));
             }
         }
+        craftingRecipe.updateCache(); // Ibramsou - Fix crash by improving execution time
     }
 
     private boolean isEmpty(){

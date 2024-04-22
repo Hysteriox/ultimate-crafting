@@ -134,6 +134,7 @@ public class CraftingRecipes extends YAMLFile{
                 }
                 CraftingRecipe craftingRecipe = new CraftingRecipe(recipeName, result, permission, slot, page, category, isOverride, this.plugin);
                 craftingRecipe.setRecipeItems(recipeItems);
+                craftingRecipe.updateCache(); // Ibramsou - Fix crash by improving execution time
                 recipes.add(craftingRecipe);
             }
         }catch (Exception ignored){

@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,19 +30,38 @@ public class Utils {
     public static boolean matchType(ItemStack itemStack, XMaterial material) {
         return !itemIsNull(itemStack) && itemStack.getType() == material.parseMaterial();
     }
-    
+
     public static int getItemQuantity(Collection<ItemStack> itemStacks, ItemStack itemStackParam) {
         int quantity = 0;
         if (itemStacks == null)
             return quantity;
         for (ItemStack itemStack : itemStacks) {
             if (itemStack != null) {
-                if (itemStack.isSimilar(itemStackParam))
+                if (itemStack.isSimilar(itemStackParam)) {
                     quantity += itemStack.getAmount();
+                }
             }
         }
         return quantity;
     }
+
+    // Ibramsou Start - Fix crash by improving execution time
+    @SuppressWarnings("deprecation")
+    public static int hashedItemStack(ItemStack itemStack) {
+        final ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null) {
+            return Objects.hash(
+                    itemStack.getType(),
+                    itemStack.getDurability(),
+                    meta
+            );
+        }
+        return Objects.hash(
+                itemStack.getType(),
+                itemStack.getDurability()
+        );
+    }
+    // Ibramsou End
     
     public static List<Placeholder> getRecipeBookPlaceholders(Category category, StatsMap statsMap) {
         int xp = statsMap.getUnlockedPlayer().getOrDefault(category.getKey(), 0);

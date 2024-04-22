@@ -50,7 +50,9 @@ public class CraftingGUIManager {
                 try {
                     CraftingRecipe craftingRecipe = craftingRecipes.get(index);
                     recipeSlots.put(slot, craftingRecipe);
-                    inventory.setItem(slot, InventoryUtils.makeItem(plugin.getInventories().previewCraftItem, craftingRecipe.getResult(), "autoRecipes"));
+                    for (int i = 0; i < 40; i++) {
+                        inventory.setItem(slot, InventoryUtils.makeItem(plugin.getInventories().previewCraftItem, craftingRecipe.getResult(), "autoRecipes"));
+                    }
                 } catch (IndexOutOfBoundsException e) {
                 }
                 index++;
@@ -59,9 +61,23 @@ public class CraftingGUIManager {
 
     }
 
+
+    private static long totalTimeElapsed;
+    private static long timeElapsedCount;
+
     // Get valid recipes that the player can currently craft.
     private List<CraftingRecipe> getQuickCraftingRecipes(Player player, int amount) {
+        long start = System.currentTimeMillis();
         List<CraftingRecipe> craftingRecipes = new ArrayList<>();
+        // Ibramsou Start - Fix crash by improving execution time
+        final Map<Integer, Integer> contentCachedMap = new HashMap<>();
+        for (ItemStack content : player.getInventory().getContents()) {
+            if (content == null || content.getType() == Material.AIR) {
+                continue;
+            }
+            contentCachedMap.merge(Utils.hashedItemStack(content), content.getAmount(), Integer::sum);
+        }
+        if (contentCachedMap.isEmpty()) return craftingRecipes;
         for (CraftingRecipe craftingRecipe : plugin.getCraftingRecipes().getRecipes()) {
             if (craftingRecipes.size() > amount) {
                 break;
@@ -69,11 +85,18 @@ public class CraftingGUIManager {
             if (!craftingRecipe.hasPermission(player)) {
                 continue;
             }
-            if (!hasEnoughItemsForRecipe(player, craftingRecipe)) {
+            /*if (!oldHasEnoughItemsForRecipe(player, craftingRecipe)) {
+                continue;
+            }*/
+            if (!hasEnoughItemsForRecipe(contentCachedMap, craftingRecipe)) {
                 continue;
             }
+            // Ibramsou End
             craftingRecipes.add(craftingRecipe);
         }
+        totalTimeElapsed += System.currentTimeMillis() - start;
+        timeElapsedCount++;
+        System.out.println("AVERAGE: " + totalTimeElapsed / timeElapsedCount + "ms");
         return craftingRecipes;
     }
 
@@ -219,18 +242,32 @@ public class CraftingGUIManager {
     }
     // Validation methods
 
-    private boolean hasEnoughItemsForRecipe(Player player, CraftingRecipe craftingRecipe) {
-        List<ItemStack> playerItems = Arrays.asList(player.getInventory().getStorageContents());
+    // Ibramsou Start - Fix crash by improving execution time
+    private boolean hasEnoughItemsForRecipe(Map<Integer, Integer> contentMap, CraftingRecipe recipe) {
+        final Set<Integer> found = new HashSet<>();
+        for (Map.Entry<Integer, Integer> entry : contentMap.entrySet()) {
+            final int hashCode = entry.getKey();
+            final int amount = entry.getValue();
+            final Integer requiredAmount = recipe.getRequiredItemsCache().get(hashCode);
+            if (requiredAmount == null) continue;
+            if (amount < requiredAmount) return false;
+            found.add(hashCode);
+        }
 
+        return found.size() >= recipe.getRequiredItemsCache().size();
+    }
+
+    private boolean oldHasEnoughItemsForRecipe(Player player, CraftingRecipe craftingRecipe) {
+        List<ItemStack> playerItems = Arrays.asList(player.getInventory().getStorageContents());
         for (ItemStack itemStack : craftingRecipe.getRecipeItems().values()) {
             // If the quantity is lesser than the required recipe, false!outputs the value of your inventory
             if (Utils.getItemQuantity(playerItems, itemStack) < Utils.getItemQuantity(craftingRecipe.getRecipeItems().values(), itemStack)) {
                 return false;
             }
         }
-
         return true;
     }
+    // Ibramsou End
 
     private void updateVanillaRecipeCrafingItems(ItemStack[] itemStacks) {
         int mappedRecipeSlot = 0;

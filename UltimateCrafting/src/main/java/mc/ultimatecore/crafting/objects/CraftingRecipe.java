@@ -21,6 +21,18 @@ public class CraftingRecipe implements Recipe {
 
     private Map<Integer, ItemStack> recipeItems;
 
+    // Ibramsou Start - Fix crash by improving execution time
+    private final Map<Integer, Integer> requiredItemsCache = new HashMap<>();
+
+    public void updateCache() {
+        for (ItemStack value : this.recipeItems.values()) {
+            int hashedValue = Utils.hashedItemStack(value);
+            int amount = value.getAmount();
+            this.requiredItemsCache.merge(hashedValue, amount, Integer::sum);
+        }
+    }
+    // Ibramsou End
+
     private final ItemStack result;
 
     private String permission;
@@ -102,7 +114,4 @@ public class CraftingRecipe implements Recipe {
     public void remove(){
         this.plugin.getCraftingRecipes().deleteRecipe(this);
     }
-
-
-
 }

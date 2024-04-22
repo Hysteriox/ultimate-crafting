@@ -39,6 +39,7 @@ public class InventoryUtils {
     }
 
     public static ItemStack makeItem(Item item, ItemStack it, String nbt) {
+
         try {
             ItemStack itemStack = it.clone();
             ItemMeta meta = itemStack.getItemMeta();
