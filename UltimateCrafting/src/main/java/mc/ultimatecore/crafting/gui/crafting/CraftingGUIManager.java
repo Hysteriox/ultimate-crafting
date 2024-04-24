@@ -190,7 +190,6 @@ public class CraftingGUIManager {
             // Attempt to stack items on the cursor
             ItemStack newStack = InventoryUtils.stackitem(result, player.getItemOnCursor());
             if (newStack != null) {
-                System.out.println(newStack.getType().name());
                 new BukkitRunnable() {
 
                     @Override
