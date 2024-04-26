@@ -3,7 +3,7 @@ package mc.ultimatecore.crafting;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Class which represents an item in an inventory.
@@ -71,4 +71,16 @@ public class Item {
         this.headOwner = headOwner;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return amount == item.amount && enabled == item.enabled && material == item.material && Objects.equals(title, item.title) && Objects.equals(headData, item.headData) && Objects.equals(headOwner, item.headOwner) && Objects.equals(lore, item.lore) && Objects.equals(slot, item.slot) && Objects.equals(command, item.command);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(material, amount, title, headData, headOwner, lore, slot, command, enabled);
+    }
 }

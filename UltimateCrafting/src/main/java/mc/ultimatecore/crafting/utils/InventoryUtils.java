@@ -13,6 +13,13 @@ import java.util.*;
 
 public class InventoryUtils {
 
+    private static final Map<Integer, ItemStack> cachedNbtItems = new HashMap<>();
+    private static final Map<Item, ItemStack> cachedItems = new HashMap<>();
+
+    public static int hashed(Item item, ItemStack it, String nbt) {
+        return Objects.hash(item.hashCode(), it, nbt);
+    }
+
     public static ItemStack makeItem(ItemStack item, String name, List<String> lore) {
         ItemMeta m = item.getItemMeta();
         if (item.getItemMeta() == null)
@@ -39,7 +46,10 @@ public class InventoryUtils {
     }
 
     public static ItemStack makeItem(Item item, ItemStack it, String nbt) {
-
+        int hashed = hashed(item, it, nbt);
+        ItemStack result = cachedNbtItems.get(hashed);
+        if (result != null) return result;
+        long start = System.currentTimeMillis();
         try {
             ItemStack itemStack = it.clone();
             ItemMeta meta = itemStack.getItemMeta();
@@ -68,7 +78,9 @@ public class InventoryUtils {
             }
             NBTItem nbtItem = new NBTItem(itemstack);
             nbtItem.setBoolean(nbt, true);
-            return nbtItem.getItem();
+            result = nbtItem.getItem();
+            cachedNbtItems.put(hashed, result);
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
             return makeItem(XMaterial.STONE, item.amount, item.title, item.lore);
@@ -81,6 +93,8 @@ public class InventoryUtils {
     }
 
     public static ItemStack makeItem(Item item) {
+        ItemStack result = cachedItems.get(item);
+        if (result != null) return result;
         try {
             ItemStack itemstack = makeItem(item.material, item.amount, item.title, item.lore);
             if (item.material == XMaterial.PLAYER_HEAD && item.headData != null) {
@@ -96,7 +110,9 @@ public class InventoryUtils {
                 m.setOwner(item.headOwner);
                 itemstack.setItemMeta(m);
             }
-            return itemstack;
+            result = itemstack;
+            cachedItems.put(item, result);
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
             return makeItem(XMaterial.STONE, item.amount, item.title, item.lore);
@@ -104,6 +120,7 @@ public class InventoryUtils {
     }
 
     public static ItemStack makeItem(Item item, List<Placeholder> placeholders, Category category) {
+
         try {
             XMaterial material = XMaterial.valueOf(category.getMaterial());
             ItemStack itemstack = makeItem(material, item.amount, Utils.processMultiplePlaceholders(item.title, placeholders), Utils.processMultiplePlaceholders(item.lore, placeholders));
